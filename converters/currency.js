@@ -12,29 +12,37 @@
 // Return a promise that will resolve to the result of conversion.
 const request = require('request-promise');
 
+const base = 'http://api.nbp.pl/api/exchangerates/rates/a';
+const format = 'format=json';
+const json = true;
+
+const rate = async (unit) => {
+  try {
+    const url = `${base}/${unit.toLowerCase()}/?${format}`;
+    const response = await request({ url, json });
+    return response.rates[0].mid;
+  } catch (err) {
+    return null;
+  }
+};
+const usd = () => rate('usd');
+const eur = () => rate('eur');
+
 const currency = async (value, from, to) => {
   if (from === to) {
     return value;
   }
-  const promiseToUSD = request('http://api.nbp.pl/api/exchangerates/rates/a/usd?format=json',
-    { json: true });
-  const promiseToEUR = request('http://api.nbp.pl/api/exchangerates/rates/a/eur?format=json',
-    { json: true });
-  const responseUSD = await promiseToUSD;
-  const rateUSD = responseUSD.rates[0].mid;
-  const responseEUR = await promiseToEUR;
-  const rateEUR = responseEUR.rates[0].mid;
   if (from === 'PLN' && to === 'USD') {
-    return parseFloat((value * rateUSD).toFixed(2));
+    return parseFloat((value * await usd()).toFixed(2));
   }
   if (from === 'USD' && to === 'PLN') {
-    return parseFloat((value / rateUSD).toFixed(2));
+    return parseFloat((value / await usd()).toFixed(2));
   }
   if (from === 'PLN' && to === 'EUR') {
-    return parseFloat((value * rateEUR).toFixed(2));
+    return parseFloat((value * await eur()).toFixed(2));
   }
   if (from === 'EUR' && to === 'PLN') {
-    return parseFloat((value / rateEUR).toFixed(2));
+    return parseFloat((value / await eur()).toFixed(2));
   }
   return 0;
 };
