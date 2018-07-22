@@ -10,11 +10,7 @@
 //
 // Return the result of conversion.
 
-const temperature = (value, from, to) => {
-
-  // ...
-
-};
+const temperature = (value, from, to) => to;
 
 module.exports = {
   temperature,

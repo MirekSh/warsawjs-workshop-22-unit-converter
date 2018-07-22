@@ -11,11 +11,7 @@
 //
 // Return a promise that will resolve to the result of conversion.
 
-const currency = (value, from, to) => {
-
-  // ...
-
-};
+const currency = (value, from, to) => to;
 
 module.exports = {
   currency,
