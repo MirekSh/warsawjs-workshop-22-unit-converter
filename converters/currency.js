@@ -13,13 +13,30 @@
 const request = require('request-promise');
 
 const currency = async (value, from, to) => {
-  const promise = request('http://api.nbp.pl/api/exchangerates/rates/a/usd?format=json',
-    { json: true });
-  const response = await promise;
-  const rate = response.rates[0].mid;
-  if (from === 'PLN' && to === 'USD') {
-    return value * rate;
+  if (from === to) {
+    return value;
   }
+  const promiseToUSD = request('http://api.nbp.pl/api/exchangerates/rates/a/usd?format=json',
+    { json: true });
+  const promiseToEUR = request('http://api.nbp.pl/api/exchangerates/rates/a/eur?format=json',
+    { json: true });
+  const responseUSD = await promiseToUSD;
+  const rateUSD = responseUSD.rates[0].mid;
+  const responseEUR = await promiseToEUR;
+  const rateEUR = responseEUR.rates[0].mid;
+  if (from === 'PLN' && to === 'USD') {
+    return parseFloat((value * rateUSD).toFixed(2));
+  }
+  if (from === 'USD' && to === 'PLN') {
+    return parseFloat((value / rateUSD).toFixed(2));
+  }
+  if (from === 'PLN' && to === 'EUR') {
+    return parseFloat((value * rateEUR).toFixed(2));
+  }
+  if (from === 'EUR' && to === 'PLN') {
+    return parseFloat((value / rateEUR).toFixed(2));
+  }
+  return 0;
 };
 
 module.exports = {
