@@ -10,8 +10,15 @@
 //   to = 'PLN'
 //
 // Return a promise that will resolve to the result of conversion.
+const request = require('request-promise');
 
-const currency = (value, from, to) => to;
+const currency = async (value, from, to) => {
+  const promise = request('http://api.nbp.pl/api/exchangerates/rates/a/usd?format=json',
+    { json: true });
+  const response = await promise;
+  const rate = response.rates[0].mid;
+  return rate;
+};
 
 module.exports = {
   currency,
