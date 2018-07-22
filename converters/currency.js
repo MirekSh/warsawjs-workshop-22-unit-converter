@@ -17,7 +17,9 @@ const currency = async (value, from, to) => {
     { json: true });
   const response = await promise;
   const rate = response.rates[0].mid;
-  return rate;
+  if (from === 'PLN' && to === 'USD') {
+    return value * rate;
+  }
 };
 
 module.exports = {
